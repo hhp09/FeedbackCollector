@@ -24,7 +24,8 @@ passport.use(
        {                                       // passport function, and passing along what strategy needs to be used
            clientID: keys.googleClientID,
            clientSecret: keys.googleClientSecret,
-           callbackURL: '/auth/google/callback'
+           callbackURL: '/auth/google/callback',
+           proxy: true
        }, (accessToken, refreshToken, profile, done) => {
            User.findOne({ googleId: profile.id })      // This query returns a promise (a tool to handle asynchronous code in JavaScript)
            // <- returns a promise to get some indication when a query has completed, and use .then statement
