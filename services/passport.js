@@ -26,19 +26,22 @@ passport.use(
            clientSecret: keys.googleClientSecret,
            callbackURL: '/auth/google/callback',
            proxy: true
-       }, (accessToken, refreshToken, profile, done) => {
-           User.findOne({ googleId: profile.id })      // This query returns a promise (a tool to handle asynchronous code in JavaScript)
-           // <- returns a promise to get some indication when a query has completed, and use .then statement
-           .then((existingUser) => {
+       }, async (accessToken, refreshToken, profile, done) => {       // using async to hint at asynchronous code below
+           const existingUser = await User.findOne({ googleId: profile.id })      // This query returns a promise (a tool to handle asynchronous code in JavaScript)
+           
+           // <- returns a promise to get some indication when a query has completed, and use .then statement. 
+           // Update: assign result of await user to another identical variable name
+           
                 if(existingUser) {  // to check if existingUser exists, then there already exists a record with given profile ID
-                    done(null, existingUser);  // tell passport that we have finished creating a user and that it should now resume the auth process
-                }   else {          // make a new record for new profile ID
-                    new User({ googleId: profile.id })  // takes the model instance and saves it to database
-                    .save()   
-                    .then((newUser) => done(null, newUser));     
-                }
+                    return done(null, existingUser);  // tell passport that we have finished creating a user and that it should now resume the auth process
+                }           
+                
+                // make a new record for new profile ID
+                const user = await new User({ googleId: profile.id }).save()  // takes the model instance and saves it to database   
+                done(null, user);
+                
            })
 
-       })
+       
    );    
 

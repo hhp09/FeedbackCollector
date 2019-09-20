@@ -1,14 +1,17 @@
 const express = require('express');     // import express  
 const mongoose = require('mongoose');
-const keys = require('./config/keys');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
+const bodyParser = require('body-parser');
+const keys = require('./config/keys');
+
 require('./models/User');
 require('./services/passport');
 
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true }); // connecting to mongoDB using npm mongoose package, and key stored in config
 
 const app = express();                  // creating Express app
+app.use(bodyParser.json());
 
 app.use(                // enabling cookies to be used inside of this application
     cookieSession({
@@ -22,7 +25,8 @@ app.use(                // enabling cookies to be used inside of this applicatio
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./routes/authRoutes')(app);    // initially, we created a const authRoutes = require(path) statement, this refactoring makes it easier to import routes
+require('./routes/authRoutes')(app);    // initially created a const authRoutes = require(path) statement, this refactoring makes it easier to import routes
+require('./routes/billingRoutes')(app);
 
 const PORT = process.env.PORT || 5000;  // look in the underlying environment to see for established ports, or use 5000
 app.listen(PORT);                       // instructs express to tell node that it wants to listen to incoming traffic from PORT

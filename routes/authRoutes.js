@@ -6,12 +6,19 @@ module.exports = (app) => {
         })                                                          // scope specifies what access we want from user account 
     );
     
-    app.get('/auth/google/callback', passport.authenticate('google')); // Route handler that now deals with bringing user back to website with the code in URL
+    // Route handler that now deals with bringing user back to website with the code in URL
+    app.get(
+        '/auth/google/callback', 
+        passport.authenticate('google'),
+        (req, res) => {                     // for incoming request, redirect the user who made the request off to next route
+            res.redirect('/surveys');
+        }
+    ); 
 
     // Whenever an authenticated user makes a get request to the URL below, log them out
     app.get('/api/logout', (req, res) => {
         req.logout();
-        res.send(req.user);
+        res.redirect('/');
     });
 
     // This route is to check if authentication has succeeded or nota
